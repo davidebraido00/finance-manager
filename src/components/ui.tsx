@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useState,
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
   type ReactNode,
@@ -136,6 +137,11 @@ export function Modal({
   title: string
   children: ReactNode
 }) {
+  // Inset della tastiera (iOS/Android): spinge il foglio sopra la tastiera
+  // usando visualViewport, così i campi in basso e il pulsante Salva restano
+  // sempre raggiungibili invece di finire coperti.
+  const [keyboardInset, setKeyboardInset] = useState(0)
+
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
@@ -143,36 +149,57 @@ export function Modal({
     }
     window.addEventListener('keydown', handler)
     document.body.style.overflow = 'hidden'
+
+    const vv = window.visualViewport
+    const onViewport = () => {
+      if (!vv) return
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      setKeyboardInset(inset)
+    }
+    vv?.addEventListener('resize', onViewport)
+    vv?.addEventListener('scroll', onViewport)
+    onViewport()
+
     return () => {
       window.removeEventListener('keydown', handler)
       document.body.style.overflow = ''
+      vv?.removeEventListener('resize', onViewport)
+      vv?.removeEventListener('scroll', onViewport)
+      setKeyboardInset(0)
     }
   }, [open, onClose])
 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-4">
-      <div
-        className="absolute inset-0"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div
-        className="animate-fade-in relative z-10 max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 shadow-xl sm:rounded-2xl"
-        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
-      >
-        <div className="mb-5 flex items-center justify-between">
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center sm:p-4"
+      style={{ paddingBottom: keyboardInset || undefined }}
+    >
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+      <div className="animate-fade-in relative z-10 flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-xl sm:max-h-[85dvh] sm:rounded-2xl">
+        {/* Maniglia (affordance nativa) — solo mobile */}
+        <div className="flex shrink-0 justify-center pt-2.5 sm:hidden">
+          <span className="h-1.5 w-10 rounded-full bg-slate-300" />
+        </div>
+        {/* Header fisso */}
+        <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-4 sm:pt-6">
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="-mr-1.5 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             aria-label="Chiudi"
           >
             <X size={20} />
           </button>
         </div>
-        {children}
+        {/* Corpo scrollabile */}
+        <div
+          className="overflow-y-auto px-6 pb-6"
+          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   )
