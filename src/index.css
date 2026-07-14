@@ -23,10 +23,16 @@
   color-scheme: light;
 }
 
-html,
+html {
+  height: 100%;
+  /* evita il ridimensionamento automatico del testo in iOS landscape */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -36,6 +42,25 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* niente flash grigio al tap su iOS/Android */
+  -webkit-tap-highlight-color: transparent;
+  /* niente "rimbalzo" della pagina sotto le barre fisse */
+  overscroll-behavior-y: none;
+}
+
+/* iOS Safari zooma sui campi con font < 16px al focus: lo evitiamo su mobile */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* i controlli devono restare comodi al tocco */
+button,
+a {
+  touch-action: manipulation;
 }
 
 /* Scrollbar minimale */

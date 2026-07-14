@@ -11,10 +11,10 @@ import {
   Settings as SettingsIcon,
   Wallet,
   LogOut,
-  Menu,
+  MoreHorizontal,
   X,
+  AlertTriangle,
 } from 'lucide-react'
-import { AlertTriangle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 import { cn } from './ui'
@@ -30,56 +30,67 @@ const NAV = [
   { to: '/impostazioni', label: 'Impostazioni', icon: SettingsIcon },
 ]
 
+// Voci principali nella barra inferiore mobile (le altre stanno in "Altro")
+const BOTTOM = [
+  { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
+  { to: '/transazioni', label: 'Movimenti', icon: ArrowLeftRight },
+  { to: '/ricorrenti', label: 'Ricorrenti', icon: Repeat },
+  { to: '/obiettivi', label: 'Obiettivi', icon: Trophy },
+]
+
 export default function Layout() {
   const { user, signOut } = useAuth()
   const { error } = useData()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
-    <div className="min-h-screen">
-      {/* Topbar mobile */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur lg:hidden">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-            <Wallet size={18} />
-          </div>
-          <span className="font-semibold">Finance</span>
+    <div className="min-h-[100dvh]">
+      {/* Topbar mobile (con safe-area per il notch) */}
+      <header
+        className="sticky top-0 z-30 flex items-center gap-2 border-b border-slate-200 bg-white/80 px-4 pb-3 backdrop-blur lg:hidden"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+      >
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
+          <Wallet size={18} />
         </div>
-        <button
-          onClick={() => setMobileOpen((v) => !v)}
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-          aria-label="Menu"
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <span className="font-semibold">Finance</span>
       </header>
 
-      {/* Sidebar */}
+      {/* Sidebar / drawer */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform lg:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+          'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform lg:z-40 lg:translate-x-0',
+          drawerOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="hidden items-center gap-2.5 px-6 py-6 lg:flex">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
-            <Wallet size={20} />
-          </div>
-          <div>
-            <div className="font-semibold leading-tight text-slate-900">
-              Finance
+        <div className="flex items-center justify-between px-6 py-6">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
+              <Wallet size={20} />
             </div>
-            <div className="text-xs text-slate-400">Manager</div>
+            <div>
+              <div className="font-semibold leading-tight text-slate-900">
+                Finance
+              </div>
+              <div className="text-xs text-slate-400">Manager</div>
+            </div>
           </div>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden"
+            aria-label="Chiudi menu"
+          >
+            <X size={20} />
+          </button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 pt-4 lg:pt-0">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => setDrawerOpen(false)}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
@@ -95,7 +106,10 @@ export default function Layout() {
           ))}
         </nav>
 
-        <div className="border-t border-slate-200 p-3">
+        <div
+          className="border-t border-slate-200 p-3"
+          style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+        >
           <div className="mb-2 truncate px-3 text-xs text-slate-400">
             {user?.email}
           </div>
@@ -109,17 +123,17 @@ export default function Layout() {
         </div>
       </aside>
 
-      {/* Overlay mobile */}
-      {mobileOpen && (
+      {/* Overlay del drawer (solo mobile) */}
+      {drawerOpen && (
         <div
-          className="fixed inset-0 z-30 bg-slate-900/30 lg:hidden"
-          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"
+          onClick={() => setDrawerOpen(false)}
         />
       )}
 
       {/* Contenuto */}
       <main className="lg:pl-64">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+        <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:py-10 lg:pb-10">
           {error && (
             <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <AlertTriangle size={18} className="mt-0.5 shrink-0" />
@@ -136,6 +150,39 @@ export default function Layout() {
           <Outlet />
         </div>
       </main>
+
+      {/* Bottom tab bar (solo mobile) */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 flex border-t border-slate-200 bg-white/90 backdrop-blur lg:hidden"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {BOTTOM.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) =>
+              cn(
+                'flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors',
+                isActive ? 'text-brand-600' : 'text-slate-400',
+              )
+            }
+          >
+            <item.icon size={22} />
+            {item.label}
+          </NavLink>
+        ))}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className={cn(
+            'flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors',
+            drawerOpen ? 'text-brand-600' : 'text-slate-400',
+          )}
+        >
+          <MoreHorizontal size={22} />
+          Altro
+        </button>
+      </nav>
     </div>
   )
 }

@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['wallet.svg', 'pwa-icon.svg'],
+      includeAssets: ['wallet.svg', 'pwa-icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Finance Manager',
         short_name: 'Finance',
