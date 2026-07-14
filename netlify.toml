@@ -1,0 +1,12 @@
+# Configurazione Netlify
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: qualunque percorso viene servito da index.html (React Router lato client),
+# così ricaricare o aprire un deep-link (es. /transazioni) non dà 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
