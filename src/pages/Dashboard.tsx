@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ResponsiveContainer,
   AreaChart,
@@ -13,7 +14,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Link } from 'react-router-dom'
 import {
   TrendingUp,
   TrendingDown,
@@ -44,11 +44,10 @@ import { formatCurrency, formatMonth, monthKey } from '../lib/format'
 import { getCategoryIcon } from '../lib/icons'
 import { Card, Button, Spinner, EmptyState, cn } from '../components/ui'
 import { PageHeader, MonthSelector } from '../components/common'
-import { TransactionForm } from '../components/TransactionForm'
 
 export default function Dashboard() {
   const { accounts, categories, transactions, subscriptions, loading } = useData()
-  const [formOpen, setFormOpen] = useState(false)
+  const navigate = useNavigate()
   const [selectedMonth, setSelectedMonth] = useState(monthKey(new Date()))
 
   const upcomingSubs = useMemo(
@@ -95,7 +94,7 @@ export default function Dashboard() {
         action={
           <div className="flex flex-wrap items-center gap-2">
             <MonthSelector month={selectedMonth} onChange={setSelectedMonth} />
-            <Button onClick={() => setFormOpen(true)}>
+            <Button onClick={() => navigate('/transazioni/nuova')}>
               <Plus size={18} /> Nuova transazione
             </Button>
           </div>
@@ -209,7 +208,7 @@ export default function Dashboard() {
             title="Nessuna transazione ancora"
             description="Aggiungi la tua prima entrata o uscita per iniziare a vedere le statistiche."
             action={
-              <Button onClick={() => setFormOpen(true)}>
+              <Button onClick={() => navigate('/transazioni/nuova')}>
                 <Plus size={18} /> Aggiungi transazione
               </Button>
             }
@@ -426,8 +425,6 @@ export default function Dashboard() {
           )}
         </>
       )}
-
-      <TransactionForm open={formOpen} onClose={() => setFormOpen(false)} />
     </div>
   )
 }

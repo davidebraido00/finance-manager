@@ -10,6 +10,7 @@ import Login from './pages/Login'
 // finiscono in chunk separati, alleggerendo il bundle iniziale.
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Transactions = lazy(() => import('./pages/Transactions'))
+const TransactionEditor = lazy(() => import('./pages/TransactionEditor'))
 const Subscriptions = lazy(() => import('./pages/Subscriptions'))
 const Budgets = lazy(() => import('./pages/Budgets'))
 const Goals = lazy(() => import('./pages/Goals'))
@@ -45,6 +46,11 @@ function Protected() {
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="/transazioni" element={<Transactions />} />
+            <Route path="/transazioni/nuova" element={<TransactionEditor />} />
+            <Route
+              path="/transazioni/:id/modifica"
+              element={<TransactionEditor />}
+            />
             <Route path="/ricorrenti" element={<Subscriptions />} />
             <Route path="/budget" element={<Budgets />} />
             <Route path="/obiettivi" element={<Goals />} />

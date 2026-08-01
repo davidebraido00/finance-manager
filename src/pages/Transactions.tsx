@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, Search, ArrowUpRight, ArrowDownRight, Filter } from 'lucide-react'
 import { useData } from '../context/DataContext'
 import type { Transaction } from '../types'
@@ -7,12 +8,10 @@ import { getCategoryIcon } from '../lib/icons'
 import { PAYMENT_METHODS, paymentLabel } from '../lib/payment'
 import { Button, Card, Input, Select, Spinner, EmptyState } from '../components/ui'
 import { PageHeader } from '../components/common'
-import { TransactionForm } from '../components/TransactionForm'
 
 export default function Transactions() {
   const { transactions, categories, accounts, loading } = useData()
-  const [formOpen, setFormOpen] = useState(false)
-  const [editing, setEditing] = useState<Transaction | null>(null)
+  const navigate = useNavigate()
 
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
@@ -77,12 +76,10 @@ export default function Transactions() {
   )
 
   function openNew() {
-    setEditing(null)
-    setFormOpen(true)
+    navigate('/transazioni/nuova')
   }
   function openEdit(t: Transaction) {
-    setEditing(t)
-    setFormOpen(true)
+    navigate(`/transazioni/${t.id}/modifica`)
   }
 
   if (loading) {
@@ -281,12 +278,6 @@ export default function Transactions() {
           )}
         </div>
       )}
-
-      <TransactionForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        editing={editing}
-      />
     </div>
   )
 }

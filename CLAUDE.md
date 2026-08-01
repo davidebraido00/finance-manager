@@ -54,9 +54,8 @@ da esporre nel frontend: la protezione è data dalla RLS.
 src/
 ├─ components/
 │  ├─ ui.tsx              # primitive UI (Card, Button, Input, Select, Modal, Badge, cn, ...)
-│  ├─ Layout.tsx          # sidebar + topbar mobile + banner errore globale (Outlet)
-│  ├─ common.tsx          # PageHeader, MonthSelector
-│  └─ TransactionForm.tsx # modale crea/modifica transazione (usata da più pagine)
+│  ├─ Layout.tsx          # sidebar (desktop) + bottom tab bar (mobile) + banner errore
+│  └─ common.tsx          # PageHeader, MonthSelector
 ├─ context/
 │  ├─ AuthContext.tsx     # sessione Supabase, signIn/signUp/signOut
 │  └─ DataContext.tsx     # TUTTI i dati + CRUD ottimistico + realtime (cuore dell'app)
@@ -72,6 +71,7 @@ src/
 │  ├─ Login.tsx           # accedi/registrati (eager, non lazy)
 │  ├─ Dashboard.tsx       # KPI, grafici Recharts, selettore mese, widget rinnovi
 │  ├─ Transactions.tsx    # lista con filtri (tipo/cat/conto/metodo/date) + paginazione
+│  ├─ TransactionEditor.tsx # PAGINA crea/modifica transazione (route /transazioni/nuova e /:id/modifica)
 │  ├─ Subscriptions.tsx   # "Ricorrenti" (entrate+uscite). NB: route /ricorrenti
 │  ├─ Budgets.tsx         # budget mensili per categoria
 │  ├─ Goals.tsx           # obiettivi di risparmio
